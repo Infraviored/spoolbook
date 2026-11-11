@@ -1,0 +1,491 @@
+{
+  "config": {
+    "step": {
+      "user": {
+        "title": "Bambu Lab account",
+        "description": "Sign in with your Bambu Lab account to access your cloud filament library. The password is only sent to Bambu Lab and is not stored.",
+        "data": {
+          "region": "Region",
+          "email": "Email address",
+          "password": "Password"
+        }
+      },
+      "code": {
+        "title": "Verification code",
+        "description": "Bambu Lab sent a verification code to {email}. Enter it here. If it did not arrive, leave the field empty and enable \"Request new code\".",
+        "data": {
+          "code": "Verification code",
+          "resend": "Request new code"
+        }
+      },
+      "tfa": {
+        "title": "Two-factor authentication",
+        "description": "Enter the code from your authenticator app.",
+        "data": {
+          "code": "2FA code"
+        }
+      },
+      "features": {
+        "title": "Features",
+        "description": "Choose what the integration should do beyond mirroring your library. Everything can be changed later via the integration's Configure button.",
+        "data": {
+          "scan_interval": "Polling interval (minutes)",
+          "spool_entities": "Create one device per spool",
+          "auto_dedup_manual": "Auto-remove manual duplicates when a spool is loaded into the AMS",
+          "color_language": "Color name language",
+          "auto_register_ams": "Auto-register new RFID spools loaded into the AMS",
+          "auto_register_ams_unavailable": "Auto-register new RFID spools loaded into the AMS (unavailable)",
+          "sync_ams_remaining": "Sync remaining weight from the AMS to the cloud library",
+          "sync_ams_remaining_unavailable": "Sync remaining weight from the AMS to the cloud library (unavailable)",
+          "empty_on_removal_pct": "Also mark as empty when removed with at most this much left (%, 0 = off)",
+          "empty_on_removal_pct_unavailable": "Also mark as empty when removed with at most this much left (%, 0 = off) (unavailable)",
+          "deduct_print_usage": "Deduct print usage from manually created spools",
+          "empty_on_runout": "Mark a spool as empty when it is removed while a print was drawing from it",
+          "empty_on_runout_unavailable": "Mark a spool as empty when it is removed while a print was drawing from it (unavailable)",
+          "tray_command": "How loading a spool sets the printer slot",
+          "tray_service": "Action for the printer slot (with \"Call an action\")",
+          "notify_service": "Action for the low-stock message",
+          "tag_devices": "Phones that open the spool page when a label is scanned"
+        },
+        "data_description": {
+          "auto_dedup_manual": "When the AMS registers a new official spool, one matching full, manually created spool is deleted from the cloud library - pre-entered stock no longer turns into duplicates.",
+          "auto_register_ams": "When an official RFID spool sits in an AMS slot but is missing from the cloud library, it is added automatically - no need to open the Bambu app or Studio first. Uses the AMS slot sensors of the Bambu Lab printer integration.",
+          "auto_register_ams_unavailable": "Requires the Bambu Lab printer integration (ha-bambulab), which is not installed or not loaded: {bambulab_url}",
+          "sync_ams_remaining": "Pushes the AMS remaining-weight estimate of official RFID spools to the library whenever it changes - like Studio does, but without Studio running. A spool reading 0 % is booked as empty immediately. Uses the Bambu Lab printer integration.",
+          "sync_ams_remaining_unavailable": "Requires the Bambu Lab printer integration (ha-bambulab), which is not installed or not loaded: {bambulab_url}",
+          "empty_on_removal_pct": "Optional extra rule: any spool taken out of the AMS whose last reading was at or below this percentage is set to 0 g, regardless of printing. Leave at 0 unless you want that.",
+          "empty_on_removal_pct_unavailable": "Requires the Bambu Lab printer integration (ha-bambulab), which is not installed or not loaded: {bambulab_url}",
+          "deduct_print_usage": "Bambu never books consumption for third-party spools. With this on, every print job finished after enabling is booked once against the manual spool the library shows in that AMS slot, using the per-slot grams the cloud records for the job. RFID spools are never touched; jobs already booked elsewhere are skipped. Cancelled jobs are booked proportionally when the printer integration saw the progress.",
+          "empty_on_runout": "The safe runout rule: a spool that was the active tray of a running or paused print (an AMS backup switch is remembered too) and is then taken out of the AMS before that print ends is set to 0 g. Spools removed after a finished print, or mid-print with more than 20 % left (filament change), are never touched.",
+          "empty_on_runout_unavailable": "Requires the Bambu Lab printer integration (ha-bambulab), which is not installed or not loaded: {bambulab_url}",
+          "tray_command": "\"Own command\" uses the local command of the Bambu Lab printer integration (bambu_lab.set_filament). \"Call an action\" calls the action below first, with the data befehl = ams/set_tray and daten = (ams_id, slot, filament_id, color, type); its response status 200 = slot set, 409 = RFID slot (only bind), 404 or no answer = fall back to the own command.",
+          "tray_service": "e.g. rest_command.my_printer_agent. Only used with \"Call an action\".",
+          "notify_service": "Called with title and message when a sort (material + colour) is down to its last spool, e.g. notify.mobile_app_my_phone or script.my_push. Empty = only a persistent notification.",
+          "tag_devices": "Empty = every phone with the Companion app."
+        }
+      }
+    },
+    "error": {
+      "invalid_auth": "Login failed - check email and password.",
+      "code_incorrect": "The code was not accepted - try again.",
+      "code_resent": "A new code was sent - check your inbox and enter it above.",
+      "cloudflare": "Blocked by Cloudflare bot protection - try again later.",
+      "cannot_connect": "Could not connect to the Bambu cloud."
+    },
+    "abort": {
+      "already_configured": "This account is already configured.",
+      "reauth_successful": "Re-authentication was successful.",
+      "wrong_account": "Re-authentication must use the same Bambu account this entry was set up with."
+    }
+  },
+  "options": {
+    "step": {
+      "init": {
+        "title": "Spoolbook options",
+        "data": {
+          "scan_interval": "Polling interval (minutes)",
+          "spool_entities": "Create one device per spool",
+          "auto_dedup_manual": "Auto-remove manual duplicates when a spool is loaded into the AMS",
+          "color_language": "Color name language",
+          "auto_register_ams": "Auto-register new RFID spools loaded into the AMS",
+          "auto_register_ams_unavailable": "Auto-register new RFID spools loaded into the AMS (unavailable)",
+          "sync_ams_remaining": "Sync remaining weight from the AMS to the cloud library",
+          "sync_ams_remaining_unavailable": "Sync remaining weight from the AMS to the cloud library (unavailable)",
+          "empty_on_removal_pct": "Also mark as empty when removed with at most this much left (%, 0 = off)",
+          "empty_on_removal_pct_unavailable": "Also mark as empty when removed with at most this much left (%, 0 = off) (unavailable)",
+          "deduct_print_usage": "Deduct print usage from manually created spools",
+          "empty_on_runout": "Mark a spool as empty when it is removed while a print was drawing from it",
+          "empty_on_runout_unavailable": "Mark a spool as empty when it is removed while a print was drawing from it (unavailable)",
+          "tray_command": "How loading a spool sets the printer slot",
+          "tray_service": "Action for the printer slot (with \"Call an action\")",
+          "notify_service": "Action for the low-stock message",
+          "tag_devices": "Phones that open the spool page when a label is scanned"
+        },
+        "data_description": {
+          "auto_dedup_manual": "When the AMS registers a new official spool, one matching full, manually created spool is deleted from the cloud library - pre-entered stock no longer turns into duplicates.",
+          "auto_register_ams": "When an official RFID spool sits in an AMS slot but is missing from the cloud library, it is added automatically - no need to open the Bambu app or Studio first. Uses the AMS slot sensors of the Bambu Lab printer integration.",
+          "auto_register_ams_unavailable": "Requires the Bambu Lab printer integration (ha-bambulab), which is not installed or not loaded: {bambulab_url}",
+          "sync_ams_remaining": "Pushes the AMS remaining-weight estimate of official RFID spools to the library whenever it changes - like Studio does, but without Studio running. A spool reading 0 % is booked as empty immediately. Uses the Bambu Lab printer integration.",
+          "sync_ams_remaining_unavailable": "Requires the Bambu Lab printer integration (ha-bambulab), which is not installed or not loaded: {bambulab_url}",
+          "empty_on_removal_pct": "Optional extra rule: any spool taken out of the AMS whose last reading was at or below this percentage is set to 0 g, regardless of printing. Leave at 0 unless you want that.",
+          "empty_on_removal_pct_unavailable": "Requires the Bambu Lab printer integration (ha-bambulab), which is not installed or not loaded: {bambulab_url}",
+          "deduct_print_usage": "Bambu never books consumption for third-party spools. With this on, every print job finished after enabling is booked once against the manual spool the library shows in that AMS slot, using the per-slot grams the cloud records for the job. RFID spools are never touched; jobs already booked elsewhere are skipped. Cancelled jobs are booked proportionally when the printer integration saw the progress.",
+          "empty_on_runout": "The safe runout rule: a spool that was the active tray of a running or paused print (an AMS backup switch is remembered too) and is then taken out of the AMS before that print ends is set to 0 g. Spools removed after a finished print, or mid-print with more than 20 % left (filament change), are never touched.",
+          "empty_on_runout_unavailable": "Requires the Bambu Lab printer integration (ha-bambulab), which is not installed or not loaded: {bambulab_url}",
+          "tray_command": "\"Own command\" uses the local command of the Bambu Lab printer integration (bambu_lab.set_filament). \"Call an action\" calls the action below first, with the data befehl = ams/set_tray and daten = (ams_id, slot, filament_id, color, type); its response status 200 = slot set, 409 = RFID slot (only bind), 404 or no answer = fall back to the own command.",
+          "tray_service": "e.g. rest_command.my_printer_agent. Only used with \"Call an action\".",
+          "notify_service": "Called with title and message when a sort (material + colour) is down to its last spool, e.g. notify.mobile_app_my_phone or script.my_push. Empty = only a persistent notification.",
+          "tag_devices": "Empty = every phone with the Companion app."
+        }
+      }
+    }
+  },
+  "selector": {
+    "region": {
+      "options": {
+        "global": "Global",
+        "china": "China"
+      }
+    },
+    "color_language": {
+      "options": {
+        "auto": "Automatic (HA language)",
+        "de": "German (falls back to English for untranslated colors)",
+        "en": "English"
+      }
+    },
+    "tray_command": {
+      "options": {
+        "own": "Own command (Bambu Lab integration)",
+        "service": "Call an action"
+      }
+    }
+  },
+  "entity": {
+    "sensor": {
+      "spool_count": {
+        "name": "Spools"
+      },
+      "total_remaining": {
+        "name": "Total remaining filament"
+      },
+      "spool_remaining_pct": {
+        "name": "Remaining"
+      },
+      "spool_remaining_g": {
+        "name": "Remaining weight"
+      }
+    },
+    "button": {
+      "delete_spool": {
+        "name": "Delete from Bambu Cloud"
+      }
+    }
+  },
+  "services": {
+    "refresh": {
+      "name": "Refresh",
+      "description": "Fetch the filament library from the Bambu cloud immediately."
+    },
+    "set_remaining": {
+      "name": "Set remaining weight",
+      "description": "Set the remaining filament weight of a spool in the cloud library.",
+      "fields": {
+        "spool_id": {
+          "name": "Spool ID",
+          "description": "The cloud id of the spool (see the spool sensor's spool_id attribute)."
+        },
+        "remaining_g": {
+          "name": "Remaining weight",
+          "description": "New remaining filament weight in grams (without the spool itself)."
+        }
+      }
+    },
+    "set_note": {
+      "name": "Set note",
+      "description": "Set the note of a spool in the cloud library.",
+      "fields": {
+        "spool_id": {
+          "name": "Spool ID",
+          "description": "The cloud id of the spool (see the spool sensor's spool_id attribute)."
+        },
+        "note": {
+          "name": "Note",
+          "description": "The new note text."
+        }
+      }
+    },
+    "set_filament_id": {
+      "name": "Set slicer profile (filament ID)",
+      "description": "Link a spool to a Bambu filament profile so Bambu Studio can assign it with matching print settings (e.g. GFA00 for Bambu PLA Basic, GFL99 for Generic PLA). An empty string unlinks the profile again.",
+      "fields": {
+        "spool_id": {
+          "name": "Spool ID",
+          "description": "The cloud id of the spool (see the spool sensor's spool_id attribute)."
+        },
+        "filament_id": {
+          "name": "Filament ID",
+          "description": "Bambu filament profile id from the catalog (get_catalog action), or empty to unlink."
+        }
+      }
+    },
+    "create_spool": {
+      "name": "Create spool",
+      "description": "Add a new spool to the Bambu cloud filament library (appears in Studio and the Bambu app too).",
+      "fields": {
+        "vendor": {
+          "name": "Vendor",
+          "description": "Filament vendor/brand."
+        },
+        "material": {
+          "name": "Material",
+          "description": "Material type, e.g. PLA or PETG."
+        },
+        "name": {
+          "name": "Filament name",
+          "description": "Product line name, e.g. PLA Matte."
+        },
+        "color": {
+          "name": "Color",
+          "description": "Hex color, e.g. #FF6A13."
+        },
+        "total_g": {
+          "name": "Spool size",
+          "description": "Full-spool filament weight in grams."
+        },
+        "remaining_g": {
+          "name": "Remaining weight",
+          "description": "Current remaining grams (defaults to the spool size)."
+        },
+        "filament_id": {
+          "name": "Filament ID",
+          "description": "Optional Bambu filament id (e.g. GFA01); resolved automatically for official filaments."
+        },
+        "display_name": {
+          "name": "Custom name",
+          "description": "Optional user-facing spool name shown in Studio, the Bambu app and Home Assistant."
+        },
+        "note": {
+          "name": "Note",
+          "description": "Optional note; shown as the spool's remark in Bambu Studio (written right after creation - the create endpoint itself has no note field)."
+        },
+        "count": {
+          "name": "Count",
+          "description": "How many identical spools to create (1-50), e.g. for sealed stock. All fields apply to every spool."
+        },
+        "empty_spool": {
+          "name": "Empty spool",
+          "description": "Id of the empty spool (tare) this spool sits on; remembered for later weighing."
+        },
+        "gross_g": {
+          "name": "Gross weight",
+          "description": "Scale reading of spool + filament; remaining = this minus the empty spool. Needs empty_spool."
+        },
+        "color_name": {
+          "name": "Colour name",
+          "description": "Own colour name, used for display and the low-stock sorts."
+        }
+      }
+    },
+    "update_spool": {
+      "name": "Update spool",
+      "description": "Change fields of an existing spool in the Bambu cloud library. Only the provided fields are written; empty strings clear the custom name, note or slicer profile.",
+      "fields": {
+        "spool_id": {
+          "name": "Spool ID",
+          "description": "The cloud id of the spool (see the spool sensor's spool_id attribute)."
+        },
+        "vendor": {
+          "name": "Vendor",
+          "description": "Filament vendor/brand."
+        },
+        "material": {
+          "name": "Material",
+          "description": "Material type, e.g. PLA or PETG."
+        },
+        "name": {
+          "name": "Filament name",
+          "description": "Product line name, e.g. PLA Matte."
+        },
+        "color": {
+          "name": "Color",
+          "description": "Hex color, e.g. #FF6A13."
+        },
+        "total_g": {
+          "name": "Spool size",
+          "description": "Full-spool filament weight in grams."
+        },
+        "remaining_g": {
+          "name": "Remaining weight",
+          "description": "Current remaining grams."
+        },
+        "note": {
+          "name": "Note",
+          "description": "Note text (empty clears it)."
+        },
+        "filament_id": {
+          "name": "Filament ID",
+          "description": "Bambu slicer profile id (empty unlinks)."
+        },
+        "display_name": {
+          "name": "Custom name",
+          "description": "User-facing spool name (empty clears it)."
+        }
+      }
+    },
+    "get_catalog": {
+      "name": "Get filament catalog",
+      "description": "Returns the vendor/product combinations the Bambu cloud accepts when creating spools, plus the account's own slicer presets (usable as filament_id)."
+    },
+    "delete_spool": {
+      "name": "Delete spool",
+      "description": "Delete a spool from the Bambu cloud filament library.",
+      "fields": {
+        "spool_id": {
+          "name": "Spool ID",
+          "description": "The cloud id of the spool to delete."
+        }
+      }
+    },
+    "assign_spool": {
+      "name": "Assign spool to AMS slot",
+      "description": "Put a library spool into an AMS slot: sets the filament on the printer tray first, then binds the spool to the slot in the Bambu cloud. Refused while the printer is busy.",
+      "fields": {
+        "spool_id": {
+          "name": "Spool ID",
+          "description": "The cloud id of the library spool."
+        },
+        "tray": {
+          "name": "AMS tray",
+          "description": "The Bambu Lab AMS tray sensor of the target slot."
+        },
+        "set_printer": {
+          "name": "Set printer tray",
+          "description": "Also write the filament to the printer tray (recommended; Studio drops bindings that do not match the tray)."
+        }
+      }
+    },
+    "unassign_slot": {
+      "name": "Unassign AMS slot",
+      "description": "Remove the library spool binding of an AMS slot in the Bambu cloud (the printer tray is not changed).",
+      "fields": {
+        "tray": {
+          "name": "AMS tray",
+          "description": "The Bambu Lab AMS tray sensor of the slot."
+        }
+      }
+    },
+    "weigh_spool": {
+      "name": "Weigh spool",
+      "description": "Set the remaining filament from a scale reading, with or without the empty spool.",
+      "fields": {
+        "spool_id": {
+          "name": "Spool ID",
+          "description": "Cloud id of the spool."
+        },
+        "weight_g": {
+          "name": "Scale reading",
+          "description": "What the scale shows in grams."
+        },
+        "with_spool": {
+          "name": "With spool",
+          "description": "On: reading includes the empty spool (its tare is subtracted). Off: filament only."
+        },
+        "empty_spool": {
+          "name": "Empty spool",
+          "description": "Empty spool id; default is the one the spool remembered or its brand's."
+        }
+      }
+    },
+    "set_empty_spool": {
+      "name": "Set empty spool",
+      "description": "Create an empty spool (name + weight) or update an existing one.",
+      "fields": {
+        "empty_spool": {
+          "name": "Empty spool",
+          "description": "Id to update; leave out to create a new one."
+        },
+        "name": {
+          "name": "Name",
+          "description": "e.g. \"Sunlu\"."
+        },
+        "weight_g": {
+          "name": "Weight",
+          "description": "Tare weight of the empty spool in grams."
+        },
+        "vendor": {
+          "name": "Brand",
+          "description": "Brand this empty spool belongs to (preselection)."
+        }
+      }
+    },
+    "delete_empty_spool": {
+      "name": "Delete empty spool",
+      "description": "Remove an empty spool from the list.",
+      "fields": {
+        "empty_spool": {
+          "name": "Empty spool",
+          "description": "Id of the empty spool."
+        }
+      }
+    },
+    "archive_spool": {
+      "name": "Archive spool",
+      "description": "Archive an empty spool (keeps it with its history) or bring it back.",
+      "fields": {
+        "spool_id": {
+          "name": "Spool ID",
+          "description": "Cloud id of the spool."
+        },
+        "archived": {
+          "name": "Archived",
+          "description": "On: archive. Off: restore."
+        }
+      }
+    },
+    "get_history": {
+      "name": "Get spool history",
+      "description": "Bookings of a spool (prints, weighing, create, archive), newest first.",
+      "fields": {
+        "spool_id": {
+          "name": "Spool ID",
+          "description": "Cloud id of the spool."
+        },
+        "limit": {
+          "name": "Limit",
+          "description": "Maximum number of entries."
+        }
+      }
+    },
+    "set_color_name": {
+      "name": "Set colour name",
+      "description": "Own colour name of a spool (display and low-stock sorts).",
+      "fields": {
+        "spool_id": {
+          "name": "Spool ID",
+          "description": "Cloud id of the spool."
+        },
+        "color_name": {
+          "name": "Colour name",
+          "description": "e.g. \"Weiß\"."
+        }
+      }
+    },
+    "load_spool": {
+      "name": "Load spool into slot",
+      "description": "Puts a library spool into an AMS slot: checks that the printer is idle, releases the spool from another slot, sets the printer slot (own command or the configured action) and binds the spool in the cloud.",
+      "fields": {
+        "spool_id": {
+          "name": "Spool",
+          "description": "Bambu library spool id."
+        },
+        "tray": {
+          "name": "Slot",
+          "description": "AMS slot sensor of the Bambu Lab integration."
+        },
+        "weight_g": {
+          "name": "Scale reading",
+          "description": "Optional: weight on the scale right after loading; booked as remaining filament."
+        },
+        "with_spool": {
+          "name": "With spool",
+          "description": "The scale reading includes the empty spool (default)."
+        },
+        "empty_spool": {
+          "name": "Empty spool",
+          "description": "Empty spool id for the tare; default: the one this spool remembered."
+        }
+      }
+    },
+    "unload_slot": {
+      "name": "Empty slot",
+      "description": "Clears the spool binding of an AMS slot (only while the printer is idle).",
+      "fields": {
+        "tray": {
+          "name": "Slot",
+          "description": "AMS slot sensor of the Bambu Lab integration."
+        }
+      }
+    }
+  }
+}

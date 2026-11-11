@@ -1,0 +1,502 @@
+{
+  "config": {
+    "step": {
+      "user": {
+        "title": "Bambu-Lab-Konto",
+        "description": "Melde dich mit deinem Bambu-Lab-Konto an, um auf deine Cloud-Filamentbibliothek zuzugreifen. Das Passwort wird nur an Bambu Lab gesendet und nicht gespeichert.",
+        "data": {
+          "region": "Region",
+          "email": "E-Mail-Adresse",
+          "password": "Passwort"
+        }
+      },
+      "code": {
+        "title": "Bestätigungscode",
+        "description": "Bambu Lab hat einen Bestätigungscode an {email} gesendet. Gib ihn hier ein. Falls keiner ankam: Feld leer lassen und „Neuen Code anfordern\" aktivieren.",
+        "data": {
+          "code": "Bestätigungscode",
+          "resend": "Neuen Code anfordern"
+        }
+      },
+      "tfa": {
+        "title": "Zwei-Faktor-Authentifizierung",
+        "description": "Gib den Code aus deiner Authenticator-App ein.",
+        "data": {
+          "code": "2FA-Code"
+        }
+      },
+      "features": {
+        "title": "Funktionen",
+        "description": "Wähle, was die Integration über das Spiegeln deiner Bibliothek hinaus tun soll. Alles lässt sich später über den Knopf „Konfigurieren“ der Integration ändern.",
+        "data": {
+          "scan_interval": "Abrufintervall (Minuten)",
+          "spool_entities": "Ein Gerät pro Spule anlegen",
+          "auto_dedup_manual": "Manuelle Duplikate automatisch entfernen, wenn eine Spule ins AMS gelegt wird",
+          "color_language": "Sprache der Farbnamen",
+          "auto_register_ams": "Neue RFID-Spulen im AMS automatisch registrieren",
+          "auto_register_ams_unavailable": "Neue RFID-Spulen im AMS automatisch registrieren (nicht verfügbar)",
+          "sync_ams_remaining": "Restmenge aus dem AMS in die Cloud-Bibliothek übertragen",
+          "sync_ams_remaining_unavailable": "Restmenge aus dem AMS in die Cloud-Bibliothek übertragen (nicht verfügbar)",
+          "empty_on_removal_pct": "Zusätzlich als leer buchen, wenn beim Entnehmen höchstens so viel übrig ist (%, 0 = aus)",
+          "empty_on_removal_pct_unavailable": "Zusätzlich als leer buchen, wenn beim Entnehmen höchstens so viel übrig ist (%, 0 = aus) (nicht verfügbar)",
+          "deduct_print_usage": "Druckverbrauch von manuell angelegten Spulen abziehen",
+          "empty_on_runout": "Spule als leer buchen, wenn sie entnommen wird, während ein Druck von ihr gedruckt hat",
+          "empty_on_runout_unavailable": "Spule als leer buchen, wenn sie entnommen wird, während ein Druck von ihr gedruckt hat (nicht verfügbar)",
+          "tray_command": "Wie das Laden einer Spule das Drucker-Fach setzt",
+          "tray_service": "Dienst für das Drucker-Fach (bei „Dienst aufrufen“)",
+          "notify_service": "Benachrichtigungsdienst für den Vorrat",
+          "tag_devices": "Handys, die beim Scannen eines Etiketts die Spulen-Seite öffnen",
+          "stock_level": "Vorrat-Warnung, wenn zur Neige geht:"
+        },
+        "data_description": {
+          "auto_dedup_manual": "Registriert das AMS eine neue Original-Spule, wird eine passende volle, manuell angelegte Spule aus der Cloud-Bibliothek gelöscht - vorerfasster Bestand wird so nicht zum Duplikat.",
+          "auto_register_ams": "Liegt eine Original-RFID-Spule in einem AMS-Slot, fehlt aber in der Cloud-Bibliothek, wird sie automatisch angelegt - ohne vorher die Bambu-App oder Studio zu öffnen. Nutzt die AMS-Slot-Sensoren der Bambu-Lab-Drucker-Integration.",
+          "auto_register_ams_unavailable": "Benötigt die Bambu-Lab-Drucker-Integration (ha-bambulab), die nicht installiert oder nicht geladen ist: {bambulab_url}",
+          "sync_ams_remaining": "Überträgt die AMS-Restmengenschätzung von Original-RFID-Spulen bei jeder Änderung in die Bibliothek - wie Studio, nur ohne laufendes Studio. Meldet das AMS 0 %, wird die Spule sofort als leer gebucht. Nutzt die Bambu-Lab-Drucker-Integration.",
+          "sync_ams_remaining_unavailable": "Benötigt die Bambu-Lab-Drucker-Integration (ha-bambulab), die nicht installiert oder nicht geladen ist: {bambulab_url}",
+          "empty_on_removal_pct": "Optionale Zusatzregel: Jede aus dem AMS entnommene Spule, deren letzter Messwert höchstens bei diesem Prozentwert lag, wird unabhängig vom Drucken auf 0 g gesetzt. Auf 0 lassen, wenn nicht gewünscht.",
+          "empty_on_removal_pct_unavailable": "Benötigt die Bambu-Lab-Drucker-Integration (ha-bambulab), die nicht installiert oder nicht geladen ist: {bambulab_url}",
+          "deduct_print_usage": "Bambu bucht für Fremdmarken-Spulen nie Verbrauch. Mit dieser Option wird jeder nach dem Einschalten beendete Druckauftrag genau einmal von der manuellen Spule abgezogen, die laut Bibliothek in dem AMS-Slot liegt - mit den Gramm pro Slot, die die Cloud zum Auftrag speichert. RFID-Spulen werden nie angefasst, anderswo bereits gebuchte Aufträge übersprungen. Abgebrochene Drucke werden anteilig gebucht, wenn die Drucker-Integration den Fortschritt gesehen hat.",
+          "empty_on_runout": "Die sichere Leerlauf-Regel: Eine Spule, die aktiver Slot eines laufenden oder pausierten Drucks war (ein AMS-Backup-Wechsel wird mitgemerkt) und vor Druckende aus dem AMS genommen wird, wird auf 0 g gesetzt. Spulen, die nach einem fertigen Druck entnommen werden, oder mitten im Druck mit über 20 % Rest (Filamentwechsel), werden nie angefasst.",
+          "empty_on_runout_unavailable": "Benötigt die Bambu-Lab-Drucker-Integration (ha-bambulab), die nicht installiert oder nicht geladen ist: {bambulab_url}",
+          "tray_command": "„Eigener Befehl“ nutzt den lokalen Befehl der Bambu-Lab-Drucker-Integration (bambu_lab.set_filament). „Dienst aufrufen“ ruft zuerst den Dienst unten auf, mit den Daten befehl = ams/set_tray und daten = (ams_id, slot, filament_id, color, type); Antwort-Status 200 = Fach gesetzt, 409 = RFID-Fach (nur binden), 404 oder keine Antwort = eigener Befehl als Rückfall.",
+          "tray_service": "z. B. rest_command.mein_drucker_agent. Nur bei „Dienst aufrufen“.",
+          "notify_service": "Wird mit title und message aufgerufen, wenn von einer Sorte (Material + Farbe) nur noch eine Spule übrig ist, z. B. notify.mobile_app_mein_handy oder script.mein_push. Leer = nur eine Benachrichtigung in Home Assistant.",
+          "tag_devices": "Leer = jedes Handy mit der Companion-App.",
+          "stock_level": "Gewarnt wird erst, wenn davon nur noch eine Spule übrig ist. „Das Material“: Solange irgendein PETG da ist, egal welche Farbe oder Marke, keine Warnung."
+        }
+      }
+    },
+    "error": {
+      "invalid_auth": "Anmeldung fehlgeschlagen – E-Mail und Passwort prüfen.",
+      "code_incorrect": "Der Code wurde nicht akzeptiert – bitte erneut versuchen.",
+      "code_resent": "Ein neuer Code wurde gesendet – Posteingang prüfen und oben eingeben.",
+      "cloudflare": "Von Cloudflare-Bot-Schutz blockiert – später erneut versuchen.",
+      "cannot_connect": "Verbindung zur Bambu-Cloud fehlgeschlagen."
+    },
+    "abort": {
+      "already_configured": "Dieses Konto ist bereits eingerichtet.",
+      "reauth_successful": "Erneute Anmeldung erfolgreich.",
+      "wrong_account": "Die erneute Anmeldung muss mit demselben Bambu-Konto erfolgen, mit dem dieser Eintrag eingerichtet wurde."
+    }
+  },
+  "options": {
+    "step": {
+      "init": {
+        "title": "Bambu-Spulen-Optionen",
+        "data": {
+          "scan_interval": "Abrufintervall (Minuten)",
+          "spool_entities": "Ein Gerät pro Spule anlegen",
+          "auto_dedup_manual": "Manuelle Duplikate automatisch entfernen, wenn eine Spule ins AMS gelegt wird",
+          "color_language": "Sprache der Farbnamen",
+          "auto_register_ams": "Neue RFID-Spulen im AMS automatisch registrieren",
+          "auto_register_ams_unavailable": "Neue RFID-Spulen im AMS automatisch registrieren (nicht verfügbar)",
+          "sync_ams_remaining": "Restmenge aus dem AMS in die Cloud-Bibliothek übertragen",
+          "sync_ams_remaining_unavailable": "Restmenge aus dem AMS in die Cloud-Bibliothek übertragen (nicht verfügbar)",
+          "empty_on_removal_pct": "Zusätzlich als leer buchen, wenn beim Entnehmen höchstens so viel übrig ist (%, 0 = aus)",
+          "empty_on_removal_pct_unavailable": "Zusätzlich als leer buchen, wenn beim Entnehmen höchstens so viel übrig ist (%, 0 = aus) (nicht verfügbar)",
+          "deduct_print_usage": "Druckverbrauch von manuell angelegten Spulen abziehen",
+          "empty_on_runout": "Spule als leer buchen, wenn sie entnommen wird, während ein Druck von ihr gedruckt hat",
+          "empty_on_runout_unavailable": "Spule als leer buchen, wenn sie entnommen wird, während ein Druck von ihr gedruckt hat (nicht verfügbar)",
+          "tray_command": "Wie das Laden einer Spule das Drucker-Fach setzt",
+          "tray_service": "Dienst für das Drucker-Fach (bei „Dienst aufrufen“)",
+          "notify_service": "Benachrichtigungsdienst für den Vorrat",
+          "tag_devices": "Handys, die beim Scannen eines Etiketts die Spulen-Seite öffnen",
+          "stock_level": "Vorrat-Warnung, wenn zur Neige geht:"
+        },
+        "data_description": {
+          "auto_dedup_manual": "Registriert das AMS eine neue Original-Spule, wird eine passende volle, manuell angelegte Spule aus der Cloud-Bibliothek gelöscht - vorerfasster Bestand wird so nicht zum Duplikat.",
+          "auto_register_ams": "Liegt eine Original-RFID-Spule in einem AMS-Slot, fehlt aber in der Cloud-Bibliothek, wird sie automatisch angelegt - ohne vorher die Bambu-App oder Studio zu öffnen. Nutzt die AMS-Slot-Sensoren der Bambu-Lab-Drucker-Integration.",
+          "auto_register_ams_unavailable": "Benötigt die Bambu-Lab-Drucker-Integration (ha-bambulab), die nicht installiert oder nicht geladen ist: {bambulab_url}",
+          "sync_ams_remaining": "Überträgt die AMS-Restmengenschätzung von Original-RFID-Spulen bei jeder Änderung in die Bibliothek - wie Studio, nur ohne laufendes Studio. Meldet das AMS 0 %, wird die Spule sofort als leer gebucht. Nutzt die Bambu-Lab-Drucker-Integration.",
+          "sync_ams_remaining_unavailable": "Benötigt die Bambu-Lab-Drucker-Integration (ha-bambulab), die nicht installiert oder nicht geladen ist: {bambulab_url}",
+          "empty_on_removal_pct": "Optionale Zusatzregel: Jede aus dem AMS entnommene Spule, deren letzter Messwert höchstens bei diesem Prozentwert lag, wird unabhängig vom Drucken auf 0 g gesetzt. Auf 0 lassen, wenn nicht gewünscht.",
+          "empty_on_removal_pct_unavailable": "Benötigt die Bambu-Lab-Drucker-Integration (ha-bambulab), die nicht installiert oder nicht geladen ist: {bambulab_url}",
+          "deduct_print_usage": "Bambu bucht für Fremdmarken-Spulen nie Verbrauch. Mit dieser Option wird jeder nach dem Einschalten beendete Druckauftrag genau einmal von der manuellen Spule abgezogen, die laut Bibliothek in dem AMS-Slot liegt - mit den Gramm pro Slot, die die Cloud zum Auftrag speichert. RFID-Spulen werden nie angefasst, anderswo bereits gebuchte Aufträge übersprungen. Abgebrochene Drucke werden anteilig gebucht, wenn die Drucker-Integration den Fortschritt gesehen hat.",
+          "empty_on_runout": "Die sichere Leerlauf-Regel: Eine Spule, die aktiver Slot eines laufenden oder pausierten Drucks war (ein AMS-Backup-Wechsel wird mitgemerkt) und vor Druckende aus dem AMS genommen wird, wird auf 0 g gesetzt. Spulen, die nach einem fertigen Druck entnommen werden, oder mitten im Druck mit über 20 % Rest (Filamentwechsel), werden nie angefasst.",
+          "empty_on_runout_unavailable": "Benötigt die Bambu-Lab-Drucker-Integration (ha-bambulab), die nicht installiert oder nicht geladen ist: {bambulab_url}",
+          "tray_command": "„Eigener Befehl“ nutzt den lokalen Befehl der Bambu-Lab-Drucker-Integration (bambu_lab.set_filament). „Dienst aufrufen“ ruft zuerst den Dienst unten auf, mit den Daten befehl = ams/set_tray und daten = (ams_id, slot, filament_id, color, type); Antwort-Status 200 = Fach gesetzt, 409 = RFID-Fach (nur binden), 404 oder keine Antwort = eigener Befehl als Rückfall.",
+          "tray_service": "z. B. rest_command.mein_drucker_agent. Nur bei „Dienst aufrufen“.",
+          "notify_service": "Wird mit title und message aufgerufen, wenn von einer Sorte (Material + Farbe) nur noch eine Spule übrig ist, z. B. notify.mobile_app_mein_handy oder script.mein_push. Leer = nur eine Benachrichtigung in Home Assistant.",
+          "tag_devices": "Leer = jedes Handy mit der Companion-App.",
+          "stock_level": "Gewarnt wird erst, wenn davon nur noch eine Spule übrig ist. „Das Material“: Solange irgendein PETG da ist, egal welche Farbe oder Marke, keine Warnung."
+        }
+      }
+    }
+  },
+  "selector": {
+    "region": {
+      "options": {
+        "global": "Global",
+        "china": "China"
+      }
+    },
+    "color_language": {
+      "options": {
+        "auto": "Automatisch (HA-Sprache)",
+        "de": "Deutsch (nicht übersetzte Farben englisch)",
+        "en": "Englisch"
+      }
+    },
+    "tray_command": {
+      "options": {
+        "own": "Eigener Befehl (Bambu-Lab-Integration)",
+        "service": "Dienst aufrufen"
+      }
+    },
+    "stock_level": {
+      "options": {
+        "material": "das Material (z. B. PETG)",
+        "color": "Material in dieser Farbe",
+        "vendor": "Material in dieser Farbe von dieser Marke"
+      }
+    }
+  },
+  "entity": {
+    "sensor": {
+      "spool_count": {
+        "name": "Spulen"
+      },
+      "total_remaining": {
+        "name": "Filament-Restmenge gesamt"
+      },
+      "spool_remaining_pct": {
+        "name": "Restmenge"
+      },
+      "spool_remaining_g": {
+        "name": "Restgewicht"
+      }
+    },
+    "button": {
+      "delete_spool": {
+        "name": "Aus Bambu-Cloud löschen"
+      }
+    }
+  },
+  "services": {
+    "refresh": {
+      "name": "Aktualisieren",
+      "description": "Die Filamentbibliothek sofort aus der Bambu-Cloud abrufen."
+    },
+    "set_remaining": {
+      "name": "Restgewicht setzen",
+      "description": "Das Restgewicht einer Spule in der Cloud-Bibliothek setzen.",
+      "fields": {
+        "spool_id": {
+          "name": "Spulen-ID",
+          "description": "Die Cloud-ID der Spule (siehe Attribut spool_id des Spulen-Sensors)."
+        },
+        "remaining_g": {
+          "name": "Restgewicht",
+          "description": "Neues Filament-Restgewicht in Gramm (ohne die Spule selbst)."
+        }
+      }
+    },
+    "set_note": {
+      "name": "Notiz setzen",
+      "description": "Die Notiz einer Spule in der Cloud-Bibliothek setzen.",
+      "fields": {
+        "spool_id": {
+          "name": "Spulen-ID",
+          "description": "Die Cloud-ID der Spule (siehe Attribut spool_id des Spulen-Sensors)."
+        },
+        "note": {
+          "name": "Notiz",
+          "description": "Der neue Notiztext."
+        }
+      }
+    },
+    "set_filament_id": {
+      "name": "Slicer-Profil setzen (Filament-ID)",
+      "description": "Verknüpft eine Spule mit einem Bambu-Filamentprofil, damit Bambu Studio sie mit passenden Druckeinstellungen zuweisen kann (z. B. GFA00 für Bambu PLA Basic, GFL99 für Generic PLA). Ein leerer Text entfernt die Verknüpfung wieder.",
+      "fields": {
+        "spool_id": {
+          "name": "Spulen-ID",
+          "description": "Die Cloud-ID der Spule (siehe Attribut spool_id des Spulen-Sensors)."
+        },
+        "filament_id": {
+          "name": "Filament-ID",
+          "description": "Bambu-Profil-ID aus dem Katalog (Aktion get_catalog), oder leer zum Entfernen."
+        }
+      }
+    },
+    "create_spool": {
+      "name": "Spule anlegen",
+      "description": "Neue Spule in der Bambu-Cloud-Filamentbibliothek anlegen (erscheint auch in Studio und der Bambu-App).",
+      "fields": {
+        "vendor": {
+          "name": "Hersteller",
+          "description": "Filament-Hersteller/Marke."
+        },
+        "material": {
+          "name": "Material",
+          "description": "Materialtyp, z. B. PLA oder PETG."
+        },
+        "name": {
+          "name": "Filamentname",
+          "description": "Produktlinie, z. B. PLA Matte."
+        },
+        "color": {
+          "name": "Farbe",
+          "description": "Hex-Farbe, z. B. #FF6A13."
+        },
+        "total_g": {
+          "name": "Spulengröße",
+          "description": "Filamentgewicht der vollen Spule in Gramm."
+        },
+        "remaining_g": {
+          "name": "Restgewicht",
+          "description": "Aktuelles Restgewicht in Gramm (Standard: Spulengröße)."
+        },
+        "filament_id": {
+          "name": "Filament-ID",
+          "description": "Optionale Bambu-Filament-ID (z. B. GFA01); wird für offizielle Filamente automatisch ermittelt."
+        },
+        "display_name": {
+          "name": "Eigener Name",
+          "description": "Optionaler Anzeigename der Spule in Studio, der Bambu-App und Home Assistant."
+        },
+        "note": {
+          "name": "Notiz",
+          "description": "Optionale Notiz; erscheint in Bambu Studio als Bemerkung der Spule (wird direkt nach dem Anlegen geschrieben - der Create-Endpunkt selbst kennt kein Notizfeld)."
+        },
+        "count": {
+          "name": "Anzahl",
+          "description": "Wie viele identische Spulen angelegt werden (1-50), z. B. für ungeöffneten Vorrat. Alle Felder gelten für jede Spule."
+        },
+        "empty_spool": {
+          "name": "Leerspule",
+          "description": "Id der Leerspule (Tara), auf der die Spule sitzt; wird fürs spätere Wiegen gemerkt."
+        },
+        "gross_g": {
+          "name": "Gewicht mit Spule",
+          "description": "Waagenwert Spule + Filament; Rest = dieser Wert minus Leerspule. Braucht empty_spool."
+        },
+        "color_name": {
+          "name": "Farbname",
+          "description": "Eigener Farbname, für Anzeige und Vorrats-Sorten."
+        }
+      }
+    },
+    "update_spool": {
+      "name": "Spule bearbeiten",
+      "description": "Felder einer bestehenden Spule in der Bambu-Cloud-Bibliothek ändern. Nur die übergebenen Felder werden geschrieben; leere Texte löschen eigenen Namen, Notiz oder Slicer-Profil.",
+      "fields": {
+        "spool_id": {
+          "name": "Spulen-ID",
+          "description": "Die Cloud-ID der Spule (siehe Attribut spool_id des Spulen-Sensors)."
+        },
+        "vendor": {
+          "name": "Hersteller",
+          "description": "Filament-Hersteller/Marke."
+        },
+        "material": {
+          "name": "Material",
+          "description": "Materialtyp, z. B. PLA oder PETG."
+        },
+        "name": {
+          "name": "Filamentname",
+          "description": "Produktlinie, z. B. PLA Matte."
+        },
+        "color": {
+          "name": "Farbe",
+          "description": "Hex-Farbe, z. B. #FF6A13."
+        },
+        "total_g": {
+          "name": "Spulengröße",
+          "description": "Filamentgewicht der vollen Spule in Gramm."
+        },
+        "remaining_g": {
+          "name": "Restgewicht",
+          "description": "Aktuelles Restgewicht in Gramm."
+        },
+        "note": {
+          "name": "Notiz",
+          "description": "Notiztext (leer löscht sie)."
+        },
+        "filament_id": {
+          "name": "Filament-ID",
+          "description": "Bambu-Slicer-Profil-ID (leer entfernt die Verknüpfung)."
+        },
+        "display_name": {
+          "name": "Eigener Name",
+          "description": "Anzeigename der Spule (leer löscht ihn)."
+        }
+      }
+    },
+    "get_catalog": {
+      "name": "Filament-Katalog abrufen",
+      "description": "Liefert die Hersteller/Produkt-Kombinationen, die die Bambu-Cloud beim Anlegen von Spulen akzeptiert, sowie die eigenen Slicer-Profile des Kontos (als filament_id nutzbar)."
+    },
+    "delete_spool": {
+      "name": "Spule löschen",
+      "description": "Eine Spule aus der Bambu-Cloud-Filamentbibliothek löschen.",
+      "fields": {
+        "spool_id": {
+          "name": "Spulen-ID",
+          "description": "Die Cloud-ID der zu löschenden Spule."
+        }
+      }
+    },
+    "assign_spool": {
+      "name": "Spule einem AMS-Slot zuweisen",
+      "description": "Legt eine Bibliotheksspule in einen AMS-Slot: setzt zuerst das Filament am Drucker-Slot und bindet dann die Spule in der Bambu-Cloud an den Slot. Wird abgelehnt, solange der Drucker beschäftigt ist.",
+      "fields": {
+        "spool_id": {
+          "name": "Spulen-ID",
+          "description": "Die Cloud-ID der Bibliotheksspule."
+        },
+        "tray": {
+          "name": "AMS-Slot",
+          "description": "Der Bambu-Lab-AMS-Slot-Sensor des Ziel-Slots."
+        },
+        "set_printer": {
+          "name": "Drucker-Slot setzen",
+          "description": "Das Filament auch am Drucker-Slot eintragen (empfohlen; Studio verwirft Zuordnungen, die nicht zum Slot passen)."
+        }
+      }
+    },
+    "unassign_slot": {
+      "name": "AMS-Slot freigeben",
+      "description": "Entfernt die Spulen-Zuordnung eines AMS-Slots in der Bambu-Cloud (der Drucker-Slot bleibt unverändert).",
+      "fields": {
+        "tray": {
+          "name": "AMS-Slot",
+          "description": "Der Bambu-Lab-AMS-Slot-Sensor des Slots."
+        }
+      }
+    },
+    "weigh_spool": {
+      "name": "Spule wiegen",
+      "description": "Restfilament aus einem Waagenwert setzen, mit oder ohne Leerspule.",
+      "fields": {
+        "spool_id": {
+          "name": "Spulen-ID",
+          "description": "Die Cloud-ID der Spule."
+        },
+        "weight_g": {
+          "name": "Waagenwert",
+          "description": "Was die Waage in Gramm zeigt."
+        },
+        "with_spool": {
+          "name": "Mit Spule",
+          "description": "An: Wert enthält die Leerspule (wird abgezogen). Aus: nur Filament."
+        },
+        "empty_spool": {
+          "name": "Leerspule",
+          "description": "Id der Leerspule; Standard ist die gemerkte oder die der Marke."
+        }
+      }
+    },
+    "set_empty_spool": {
+      "name": "Leerspule setzen",
+      "description": "Leerspule anlegen (Name + Gewicht) oder ändern.",
+      "fields": {
+        "empty_spool": {
+          "name": "Leerspule",
+          "description": "Zu ändernde Id; leer lassen zum Anlegen."
+        },
+        "name": {
+          "name": "Name",
+          "description": "z. B. \"Sunlu\"."
+        },
+        "weight_g": {
+          "name": "Gewicht",
+          "description": "Leergewicht der Spule in Gramm."
+        },
+        "vendor": {
+          "name": "Marke",
+          "description": "Marke, zu der die Leerspule gehört (Vorauswahl)."
+        }
+      }
+    },
+    "delete_empty_spool": {
+      "name": "Leerspule löschen",
+      "description": "Eine Leerspule aus der Liste entfernen.",
+      "fields": {
+        "empty_spool": {
+          "name": "Leerspule",
+          "description": "Id der Leerspule."
+        }
+      }
+    },
+    "archive_spool": {
+      "name": "Spule archivieren",
+      "description": "Leere Spule ins Archiv (bleibt mit Verlauf erhalten) oder zurückholen.",
+      "fields": {
+        "spool_id": {
+          "name": "Spulen-ID",
+          "description": "Die Cloud-ID der Spule."
+        },
+        "archived": {
+          "name": "Archiviert",
+          "description": "An: archivieren. Aus: zurückholen."
+        }
+      }
+    },
+    "get_history": {
+      "name": "Spulen-Verlauf",
+      "description": "Buchungen einer Spule (Drucke, Wiegen, Anlegen, Archiv), neueste zuerst.",
+      "fields": {
+        "spool_id": {
+          "name": "Spulen-ID",
+          "description": "Die Cloud-ID der Spule."
+        },
+        "limit": {
+          "name": "Anzahl",
+          "description": "Höchstens so viele Einträge."
+        }
+      }
+    },
+    "set_color_name": {
+      "name": "Farbname setzen",
+      "description": "Eigener Farbname einer Spule (Anzeige und Vorrats-Sorten).",
+      "fields": {
+        "spool_id": {
+          "name": "Spulen-ID",
+          "description": "Die Cloud-ID der Spule."
+        },
+        "color_name": {
+          "name": "Farbname",
+          "description": "z. B. \"Weiß\"."
+        }
+      }
+    },
+    "load_spool": {
+      "name": "Spule ins Fach laden",
+      "description": "Legt eine Spule der Bibliothek in ein AMS-Fach: prüft, dass der Drucker nicht arbeitet, gibt die Spule in einem anderen Fach frei, setzt das Drucker-Fach (eigener Befehl oder eingestellter Dienst) und bindet die Spule in der Cloud.",
+      "fields": {
+        "spool_id": {
+          "name": "Spule",
+          "description": "Kennung der Spule in der Bambu-Bibliothek."
+        },
+        "tray": {
+          "name": "Fach",
+          "description": "AMS-Fach-Sensor der Bambu-Lab-Integration."
+        },
+        "weight_g": {
+          "name": "Gewicht laut Waage",
+          "description": "Optional: Gewicht direkt nach dem Einlegen; wird als Restmenge gebucht."
+        },
+        "with_spool": {
+          "name": "Mit Spule",
+          "description": "Das Gewicht enthält die Leerspule (Standard)."
+        },
+        "empty_spool": {
+          "name": "Leerspule",
+          "description": "Kennung der Leerspule fürs Abziehen; Standard: die gemerkte dieser Spule."
+        }
+      }
+    },
+    "unload_slot": {
+      "name": "Fach leeren",
+      "description": "Löst die Spulen-Bindung eines AMS-Fachs (nur wenn der Drucker nicht arbeitet).",
+      "fields": {
+        "tray": {
+          "name": "Fach",
+          "description": "AMS-Fach-Sensor der Bambu-Lab-Integration."
+        }
+      }
+    }
+  }
+}

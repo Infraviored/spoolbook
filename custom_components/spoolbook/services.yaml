@@ -1,0 +1,419 @@
+refresh:
+  fields: {}
+
+set_remaining:
+  fields:
+    spool_id:
+      required: true
+      example: 5705646
+      selector:
+        number:
+          min: 1
+          max: 999999999
+          mode: box
+    remaining_g:
+      required: true
+      example: 750
+      selector:
+        number:
+          min: 0
+          max: 20000
+          step: 1
+          unit_of_measurement: g
+          mode: box
+
+set_note:
+  fields:
+    spool_id:
+      required: true
+      example: 5705646
+      selector:
+        number:
+          min: 1
+          max: 999999999
+          mode: box
+    note:
+      required: true
+      example: "Opened 2026-08, stored in drybox"
+      selector:
+        text:
+
+set_filament_id:
+  fields:
+    spool_id:
+      required: true
+      example: 5705646
+      selector:
+        number:
+          min: 1
+          max: 999999999
+          mode: box
+    filament_id:
+      required: true
+      example: "GFA00"
+      selector:
+        text:
+
+create_spool:
+  fields:
+    vendor:
+      required: false
+      default: "Bambu Lab"
+      example: "Bambu Lab"
+      selector:
+        text:
+    material:
+      required: true
+      example: "PLA"
+      selector:
+        text:
+    name:
+      required: true
+      example: "PLA Matte"
+      selector:
+        text:
+    color:
+      required: true
+      example: "#FF6A13"
+      selector:
+        text:
+    total_g:
+      required: false
+      default: 1000
+      selector:
+        number:
+          min: 1
+          max: 20000
+          step: 1
+          unit_of_measurement: g
+          mode: box
+    remaining_g:
+      required: false
+      selector:
+        number:
+          min: 0
+          max: 20000
+          step: 1
+          unit_of_measurement: g
+          mode: box
+    filament_id:
+      required: false
+      example: "GFA01"
+      selector:
+        text:
+    display_name:
+      required: false
+      example: "Burnt Titanium"
+      selector:
+        text:
+    note:
+      required: false
+      example: "Opened 2026-08, stored in drybox"
+      selector:
+        text:
+    count:
+      required: false
+      default: 1
+      selector:
+        number:
+          min: 1
+          max: 50
+          step: 1
+          mode: box
+    empty_spool:
+      required: false
+      example: sunlu
+      selector:
+        text:
+    gross_g:
+      required: false
+      example: 1230
+      selector:
+        number:
+          min: 0
+          max: 25000
+          step: 1
+          unit_of_measurement: g
+          mode: box
+    color_name:
+      required: false
+      example: "Weiß"
+      selector:
+        text:
+
+update_spool:
+  fields:
+    spool_id:
+      required: true
+      example: 5705646
+      selector:
+        number:
+          min: 1
+          max: 999999999
+          mode: box
+    vendor:
+      required: false
+      example: "Flashforge"
+      selector:
+        text:
+    material:
+      required: false
+      example: "PLA"
+      selector:
+        text:
+    name:
+      required: false
+      example: "PLA Pro"
+      selector:
+        text:
+    color:
+      required: false
+      example: "#FF6A13"
+      selector:
+        text:
+    total_g:
+      required: false
+      selector:
+        number:
+          min: 1
+          max: 20000
+          step: 1
+          unit_of_measurement: g
+          mode: box
+    remaining_g:
+      required: false
+      selector:
+        number:
+          min: 0
+          max: 20000
+          step: 1
+          unit_of_measurement: g
+          mode: box
+    note:
+      required: false
+      example: "Opened 2026-08, stored in drybox"
+      selector:
+        text:
+    filament_id:
+      required: false
+      example: "GFA00"
+      selector:
+        text:
+    display_name:
+      required: false
+      example: "Burnt Titanium"
+      selector:
+        text:
+
+get_catalog:
+  fields: {}
+
+delete_spool:
+  fields:
+    spool_id:
+      required: true
+      example: 5705646
+      selector:
+        number:
+          min: 1
+          max: 999999999
+          mode: box
+
+assign_spool:
+  fields:
+    spool_id:
+      required: true
+      example: 5705646
+      selector:
+        number:
+          min: 1
+          max: 999999999
+          mode: box
+    tray:
+      required: true
+      example: sensor.ams_1_tray_4
+      selector:
+        entity:
+          integration: bambu_lab
+          domain: sensor
+    set_printer:
+      required: false
+      default: true
+      selector:
+        boolean:
+
+unassign_slot:
+  fields:
+    tray:
+      required: true
+      example: sensor.ams_1_tray_4
+      selector:
+        entity:
+          integration: bambu_lab
+          domain: sensor
+
+weigh_spool:
+  fields:
+    spool_id:
+      required: true
+      example: 5705646
+      selector:
+        number:
+          min: 1
+          max: 999999999
+          mode: box
+    weight_g:
+      required: true
+      example: 980
+      selector:
+        number:
+          min: 0
+          max: 25000
+          step: 1
+          unit_of_measurement: g
+          mode: box
+    with_spool:
+      required: false
+      default: true
+      selector:
+        boolean:
+    empty_spool:
+      required: false
+      example: sunlu
+      selector:
+        text:
+
+set_empty_spool:
+  fields:
+    empty_spool:
+      required: false
+      example: bambu
+      selector:
+        text:
+    name:
+      required: false
+      example: "Sunlu"
+      selector:
+        text:
+    weight_g:
+      required: false
+      example: 225
+      selector:
+        number:
+          min: 1
+          max: 2000
+          step: 1
+          unit_of_measurement: g
+          mode: box
+    vendor:
+      required: false
+      example: "SUNLU"
+      selector:
+        text:
+
+delete_empty_spool:
+  fields:
+    empty_spool:
+      required: true
+      example: sunlu
+      selector:
+        text:
+
+archive_spool:
+  fields:
+    spool_id:
+      required: true
+      example: 5705646
+      selector:
+        number:
+          min: 1
+          max: 999999999
+          mode: box
+    archived:
+      required: false
+      default: true
+      selector:
+        boolean:
+
+get_history:
+  fields:
+    spool_id:
+      required: true
+      example: 5705646
+      selector:
+        number:
+          min: 1
+          max: 999999999
+          mode: box
+    limit:
+      required: false
+      default: 20
+      selector:
+        number:
+          min: 1
+          max: 100
+          mode: box
+
+load_spool:
+  fields:
+    spool_id:
+      required: true
+      example: 5705646
+      selector:
+        number:
+          min: 1
+          max: 999999999
+          mode: box
+    tray:
+      required: true
+      example: sensor.ams_1_tray_4
+      selector:
+        entity:
+          integration: bambu_lab
+          domain: sensor
+    weight_g:
+      required: false
+      example: 1180
+      selector:
+        number:
+          min: 0
+          max: 25000
+          step: 1
+          unit_of_measurement: g
+          mode: box
+    with_spool:
+      required: false
+      default: true
+      selector:
+        boolean:
+    empty_spool:
+      required: false
+      example: sunlu
+      selector:
+        text:
+
+unload_slot:
+  fields:
+    tray:
+      required: true
+      example: sensor.ams_1_tray_4
+      selector:
+        entity:
+          integration: bambu_lab
+          domain: sensor
+
+set_color_name:
+  fields:
+    spool_id:
+      required: true
+      example: 5705646
+      selector:
+        number:
+          min: 1
+          max: 999999999
+          mode: box
+    color_name:
+      required: true
+      example: "Weiß"
+      selector:
+        text:
