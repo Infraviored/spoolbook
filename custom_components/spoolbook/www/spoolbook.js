@@ -553,8 +553,12 @@
         this._render();
       } else if (langChanged && !this._st.busy) {
         this._render();
-      } else if (lib !== this._lastLib && ["lager", "detail", "fach", "ams"].includes(this._st.view) && !this._st.busy) {
-        this._render();
+      } else if (lib !== this._lastLib || (this._st.dirty && !this._st.busy && !this._typing())) {
+        // The library changed (e.g. the empty spool just added with "Add" arrives while the
+        // save is still busy): redraw in every view, but never while a save runs or someone
+        // types into a field - then remember it and redraw at the next quiet update.
+        if (this._st.busy || this._typing()) this._st.dirty = true;
+        else this._render();
       }
       this._lastLib = lib;
     }
@@ -905,8 +909,14 @@
     }
 
     // ------------------------------------------------------------ render
+    _typing() {
+      const a = this._root && this._root.activeElement;
+      return !!a && /^(INPUT|TEXTAREA|SELECT)$/.test(a.tagName);
+    }
+
     _render() {
       if (!this._root || !this._st) return;
+      this._st.dirty = false;
       const v = this._st.view;
       const body =
         v === "wiegen" ? this._rWeigh() :
