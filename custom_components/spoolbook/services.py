@@ -385,6 +385,7 @@ async def async_unassign(
     refresh: bool = True,
 ) -> dict[str, Any]:
     """Clear the cloud binding of a slot."""
+    coordinator.ledger.forget_binding(tray["entity_id"])
     cloud = await _cloud_write(
         hass,
         coordinator,
@@ -673,7 +674,10 @@ def async_register_services(hass: HomeAssistant) -> None:
     async def handle_assign_spool(call: ServiceCall) -> dict[str, Any]:
         coordinator, spool = _find_spool(hass, call.data["spool_id"])
         tray = _resolve_tray(hass, call.data["tray"])
-        ensure_idle(hass, tray)
+        if call.data["set_printer"]:
+            # Cloud-only binding leaves the printer alone, so it is fine mid-print
+            # (e.g. re-binding a spool the cloud dropped while the slot kept it).
+            ensure_idle(hass, tray)
         return await async_assign(hass, coordinator, spool, tray, call.data["set_printer"])
 
     async def handle_unassign_slot(call: ServiceCall) -> dict[str, Any]:

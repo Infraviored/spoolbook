@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 import logging
+import time
 from datetime import timedelta
 from typing import Any
 
@@ -25,6 +26,7 @@ from .ams_register import (
 )
 from .usage import UsageDeductor, find_mounted_manual_spool, slot_from_mapping
 from .spool_ledger import SpoolLedger
+from . import binding_guard
 from .live_monitor import LiveMonitor
 from .print_live import pick_progress
 from .colors import BambuColorDB
@@ -176,6 +178,7 @@ class BambuFilamentsCoordinator(DataUpdateCoordinator[dict[int, dict[str, Any]]]
         # previous sync" for the dedup step below, so pre-entered manual stock
         # gets consumed exactly as it would after Studio/Handy registered it.
         data = await self._async_ams_pass(data)
+        await self._async_guard_bindings(data)
         if self.data is not None and self.config_entry.options.get(
             OPT_AUTO_DEDUP, DEFAULT_AUTO_DEDUP
         ):
@@ -290,6 +293,47 @@ class BambuFilamentsCoordinator(DataUpdateCoordinator[dict[int, dict[str, Any]]]
         self._last_remain = {t.tray_uuid: (t.remain, t) for t in trays}
         self._track_printing_from(trays)
         return data
+
+    async def _async_guard_bindings(self, data: dict[int, dict[str, Any]]) -> None:
+        """Re-bind spools the cloud dropped while the slot kept them (binding_guard.py)."""
+        if not bambulab_available(self.hass):
+            return
+        from .services import async_assign  # services imports this module
+        from .trays import list_trays
+
+        def tray_attrs(entity_id: str):
+            st = self.hass.states.get(entity_id)
+            return (st.state, st.attributes) if st is not None else (None, {})
+
+        res = binding_guard.plan(
+            self.ledger.bindings, list_trays(self.hass), data, tray_attrs, time.time()
+        )
+        if res.changed:
+            self.ledger.save_bindings()
+        for tray, spool in res.restore:
+            try:
+                await async_assign(self.hass, self, dict(spool), tray, False, refresh=False)
+            except Exception as err:  # noqa: BLE001 - next sync tries again after the cooldown
+                _LOGGER.warning("Restoring the binding of %s failed: %s", tray["entity_id"], err)
+                continue
+            _LOGGER.warning(
+                "Bambu cloud dropped the binding of spool %s in %s; restored it",
+                spool["id"], tray["label"],
+            )
+            spool.update(
+                inPrinter=True, devId=tray["dev_id"], amsId=tray["ams_id"], slotId=tray["slot_id"]
+            )
+            self.ledger.add_history(
+                int(spool["id"]), "korrektur",
+                text=f"Cloud hatte {tray['label']} gelöst, wieder zugeordnet",
+            )
+        for tray, spool in res.give_up:
+            await self.async_notify(
+                "Spoolbook: Zuordnung wieder gelöst",
+                f"Die Bambu-Cloud hat die Spule in {tray['label']} erneut gelöst, "
+                "nachdem Spoolbook sie wiederhergestellt hatte. Bitte im Dashboard neu zuordnen.",
+                f"spoolbook_binding_{tray['entity_id']}",
+            )
 
     def _track_printing_from(self, trays: list[MountedTray]) -> None:
         """Remember which mounted spools a running/paused print draws from."""

@@ -81,6 +81,7 @@ def _with_defaults(data: dict[str, Any] | None) -> dict[str, Any]:
     data.setdefault("low_notified", [])
     data.setdefault("known_sorts", [])
     data.setdefault("notes_migrated", False)
+    data.setdefault("bindings", {})
     return data
 
 
@@ -226,6 +227,21 @@ class SpoolLedger:
         if item := self.empty_spool_for_vendor(spool.get("filamentVendor")):
             return item["id"]
         return None
+
+    # ------------------------------------------------------ slot bindings
+
+    @property
+    def bindings(self) -> dict[str, dict[str, Any]]:
+        """Last known binding per slot entity (binding_guard.py)."""
+        return self._data["bindings"]
+
+    def save_bindings(self) -> None:
+        self._save()
+
+    def forget_binding(self, tray_entity: str) -> None:
+        """The user unassigned this slot on purpose: never restore it."""
+        if self._data["bindings"].pop(tray_entity, None) is not None:
+            self._save()
 
     # -------------------------------------------------------------- history
 
